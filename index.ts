@@ -9,7 +9,7 @@
 import { OttoAuth } from "./src/auth.js";
 import { OttoMcpClient } from "./src/mcp-client.js";
 
-const DEFAULT_SERVER_URL = "https://api.otto.com/mcp/";
+const DEFAULT_SERVER_URL = "https://api.ottotheagent.com/mcp";
 
 export default function register(api: any) {
   const config = (api.pluginConfig ?? {}) as { serverUrl?: string };

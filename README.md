@@ -29,7 +29,7 @@ In your `openclaw.json`:
     "entries": {
       "openclaw-otto-travel": {
         "config": {
-          "serverUrl": "https://api.otto.com/mcp/"
+          "serverUrl": "https://api.ottotheagent.com/mcp"
         }
       }
     }
@@ -37,7 +37,7 @@ In your `openclaw.json`:
 }
 ```
 
-`serverUrl` defaults to `https://api.otto.com/mcp/` if omitted.
+`serverUrl` defaults to `https://api.ottotheagent.com/mcp` if omitted.
 
 ## Tools
 
@@ -59,7 +59,7 @@ Tools are discovered dynamically from the MCP server. Currently available:
 ```
 OpenClaw Gateway
   └─ otto-travel plugin (this repo)
-       └─ StreamableHTTP → https://api.otto.com/mcp/
+       └─ StreamableHTTP → https://api.ottotheagent.com/mcp
             with Authorization: Bearer <oauth_token>
 ```
 
