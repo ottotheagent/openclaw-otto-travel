@@ -27,7 +27,7 @@ In your `openclaw.json`:
 {
   "plugins": {
     "entries": {
-      "otto-travel": {
+      "openclaw-otto-travel": {
         "config": {
           "serverUrl": "https://api.otto.com/mcp/"
         }

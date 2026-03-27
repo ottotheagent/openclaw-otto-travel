@@ -19,7 +19,7 @@ export default function register(api: any) {
   const mcp = new OttoMcpClient(serverUrl, auth, api.logger);
 
   api.registerService({
-    id: "otto-travel",
+    id: "openclaw-otto-travel",
 
     async start() {
       try {
