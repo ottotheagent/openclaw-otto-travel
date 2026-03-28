@@ -8,7 +8,7 @@
     "properties": {
       "serverUrl": {
         "type": "string",
-        "description": "Otto MCP server URL (e.g. https://api.ottotheagent.com/mcp). Defaults to production."
+        "description": "Otto MCP server URL (e.g. https://api.ottotheagent.com/mcp)"
       }
     }
   }
