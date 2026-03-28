@@ -1,25 +1,23 @@
 /**
  * RFC 8628 Device Authorization Grant + token refresh.
  *
- * Flow:
- * 1. POST /oauth/register → get client_id (one-time, persisted with tokens)
- * 2. POST /oauth/device_authorization → get device_code + user_code
- * 3. Print verification URL for user
- * 4. Poll POST /oauth/token until approved
- * 5. On token expiry, use refresh_token to get new access_token
+ * Two modes:
+ * - Interactive: initiateDeviceAuth() returns URL → pollForApproval() blocks until approved
+ * - Background: getAccessToken() uses stored tokens or refresh, never starts device flow
  */
 
 import { type StoredTokens, isExpired, loadTokens, saveTokens } from "./token-store.js";
 
 const DEVICE_CODE_GRANT = "urn:ietf:params:oauth:grant-type:device_code";
 
-interface DeviceAuthResponse {
+export interface DeviceAuthInfo {
   device_code: string;
   user_code: string;
   verification_uri: string;
   verification_uri_complete: string;
   expires_in: number;
   interval: number;
+  client_id: string;
 }
 
 interface TokenResponse {
@@ -44,14 +42,25 @@ export class OttoAuth {
     private logger: Logger,
   ) {}
 
-  /** Base URL without trailing /mcp/ path */
   private get baseUrl(): string {
     return this.serverUrl.replace(/\/mcp\/?$/, "");
   }
 
+  /** Check if valid tokens exist (on disk or in memory). */
+  async hasTokens(): Promise<boolean> {
+    if (!this.tokens) {
+      this.tokens = await loadTokens(this.serverUrl);
+    }
+    if (!this.tokens) return false;
+    // If expired but we have a refresh token, we can still recover
+    if (isExpired(this.tokens) && !this.tokens.refresh_token) return false;
+    return true;
+  }
+
   /**
-   * Get a valid access token. Loads from disk, refreshes if expired,
-   * or runs the full device auth flow if no tokens exist.
+   * Get a valid access token. Uses stored tokens or refresh.
+   * Throws if no tokens exist — caller should use hasTokens() first
+   * and run the setup flow if needed.
    */
   async getAccessToken(): Promise<string> {
     if (!this.tokens) {
@@ -66,7 +75,21 @@ export class OttoAuth {
       return this.refresh();
     }
 
-    return this.deviceAuthFlow();
+    throw new Error("[otto] No tokens available. Run otto_setup first.");
+  }
+
+  /** Step 1 of device auth: register client + request code. Returns info for display. */
+  async initiateDeviceAuth(): Promise<DeviceAuthInfo> {
+    const clientId = await this.registerClient();
+    const device = await this.requestDeviceCode(clientId);
+    return { ...device, client_id: clientId };
+  }
+
+  /** Step 2 of device auth: poll until user approves. Blocks. */
+  async pollForApproval(info: DeviceAuthInfo): Promise<void> {
+    const tokenData = await this.pollForToken(info);
+    await this.persistTokens(tokenData, info.client_id);
+    this.logger.info("[otto] Authorization complete, tokens saved");
   }
 
   /** Refresh using stored refresh_token. Deduplicates concurrent calls. */
@@ -88,9 +111,9 @@ export class OttoAuth {
         });
 
         if (!res.ok) {
-          this.logger.warn("[otto] Refresh failed, starting device auth flow");
+          this.logger.warn("[otto] Refresh failed — tokens cleared, run otto_setup again");
           this.tokens = null;
-          return this.deviceAuthFlow();
+          throw new Error("[otto] Token refresh failed. Run otto_setup to re-authorize.");
         }
 
         const data: TokenResponse = await res.json();
@@ -104,29 +127,6 @@ export class OttoAuth {
     return this.refreshing;
   }
 
-  /** Full device authorization flow — registers client, gets code, polls. */
-  private async deviceAuthFlow(): Promise<string> {
-    const clientId = await this.registerClient();
-    const device = await this.requestDeviceCode(clientId);
-
-    this.logger.info(
-      `\n` +
-        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-        `  Otto Travel — Device Authorization\n` +
-        `\n` +
-        `  Visit: ${device.verification_uri_complete}\n` +
-        `\n` +
-        `  Or go to: ${device.verification_uri}\n` +
-        `  Enter code: ${device.user_code}\n` +
-        `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`,
-    );
-
-    const tokenData = await this.pollForToken(device, clientId);
-    await this.persistTokens(tokenData, clientId);
-    return tokenData.access_token;
-  }
-
-  /** Register an OAuth client via DCR. One-time per server. */
   private async registerClient(): Promise<string> {
     const res = await fetch(`${this.baseUrl}/oauth/register`, {
       method: "POST",
@@ -146,8 +146,7 @@ export class OttoAuth {
     return data.client_id;
   }
 
-  /** Request a device code. */
-  private async requestDeviceCode(clientId: string): Promise<DeviceAuthResponse> {
+  private async requestDeviceCode(clientId: string): Promise<Omit<DeviceAuthInfo, "client_id">> {
     const params = new URLSearchParams({ client_id: clientId });
     const res = await fetch(`${this.baseUrl}/oauth/device_authorization`, {
       method: "POST",
@@ -162,18 +161,17 @@ export class OttoAuth {
     return res.json();
   }
 
-  /** Poll token endpoint until user approves or code expires. */
-  private async pollForToken(device: DeviceAuthResponse, clientId: string): Promise<TokenResponse> {
-    const deadline = Date.now() + device.expires_in * 1000;
-    let interval = device.interval * 1000;
+  private async pollForToken(info: DeviceAuthInfo): Promise<TokenResponse> {
+    const deadline = Date.now() + info.expires_in * 1000;
+    let interval = info.interval * 1000;
 
     while (Date.now() < deadline) {
       await sleep(interval);
 
       const params = new URLSearchParams({
         grant_type: DEVICE_CODE_GRANT,
-        device_code: device.device_code,
-        client_id: clientId,
+        device_code: info.device_code,
+        client_id: info.client_id,
       });
 
       const res = await fetch(`${this.baseUrl}/oauth/token`, {
