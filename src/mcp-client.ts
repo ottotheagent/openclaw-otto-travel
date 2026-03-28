@@ -7,12 +7,10 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 
 import { OttoAuth } from "./auth.js";
+import type { Logger } from "./types.js";
 
-interface Logger {
-  info: (...args: unknown[]) => void;
-  warn: (...args: unknown[]) => void;
-  error: (...args: unknown[]) => void;
-}
+const CLIENT_NAME = "openclaw-otto-travel";
+const CLIENT_VERSION = "0.1.0";
 
 export class OttoMcpClient {
   private client: Client | null = null;
@@ -33,7 +31,7 @@ export class OttoMcpClient {
       },
     });
 
-    this.client = new Client({ name: "openclaw-otto-travel", version: "0.1.0" });
+    this.client = new Client({ name: CLIENT_NAME, version: CLIENT_VERSION });
     await this.client.connect(this.transport);
     this.logger.info("[otto] Connected to MCP server");
   }
@@ -50,11 +48,10 @@ export class OttoMcpClient {
     try {
       return await this.client.callTool({ name, arguments: args });
     } catch (err) {
-      // On auth error, refresh token and retry once
       if (this.isAuthError(err)) {
         this.logger.info("[otto] Token expired, reconnecting...");
         await this.reconnect();
-        return await this.client.callTool({ name, arguments: args });
+        return await this.client!.callTool({ name, arguments: args });
       }
       throw err;
     }
@@ -64,7 +61,7 @@ export class OttoMcpClient {
     try {
       await this.transport?.close();
     } catch {
-      // Ignore close errors
+      // Ignore close errors during teardown
     }
     this.client = null;
     this.transport = null;
@@ -77,6 +74,8 @@ export class OttoMcpClient {
 
   private isAuthError(err: unknown): boolean {
     const msg = String(err);
-    return msg.includes("401") || msg.includes("Unauthorized") || msg.includes("token");
+    // Match HTTP 401 status or explicit "Unauthorized" — avoid false positives
+    // from generic "token" substring in unrelated errors
+    return msg.includes("401") || msg.includes("Unauthorized");
   }
 }

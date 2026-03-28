@@ -4,46 +4,60 @@ OpenClaw plugin for Otto Travel — search, compare, and book flights and hotels
 
 ## Install
 
+### 1. Install the plugin
+
 ```bash
-openclaw plugins install ./openclaw-otto-travel
+openclaw plugins install ~/.openclaw/workspace/openclaw-otto-travel.zip
 ```
 
-## First Run
+### 2. Configure `~/.openclaw/openclaw.json`
 
-On first use, the plugin runs an OAuth Device Authorization flow:
-
-1. A URL and code are printed to your terminal
-2. Visit the URL and enter the code
-3. Log in to your Otto account and approve
-4. The plugin stores tokens locally at `~/.openclaw/.otto-tokens.json`
-
-Subsequent runs use the stored tokens. Refresh is automatic.
-
-## Configuration
-
-In your `openclaw.json`:
+Merge these keys into your existing config:
 
 ```json
 {
   "plugins": {
-    "entries": {
-      "openclaw-otto-travel": {
-        "config": {
-          "serverUrl": "https://api.ottotheagent.com/mcp"
-        }
+    "allow": ["openclaw-otto-travel"]
+  }
+}
+```
+
+### 3. Allow plugin tools in sandbox
+
+If sandbox is enabled (`agents.defaults.sandbox.mode` is `"all"` or `"non-main"`), plugin tools are blocked by default. Add this to your config:
+
+```json
+{
+  "tools": {
+    "sandbox": {
+      "tools": {
+        "allow": ["openclaw-otto-travel"]
       }
     }
   }
 }
 ```
 
-`serverUrl` defaults to `https://api.ottotheagent.com/mcp` if omitted.
+Skip this step if sandbox mode is `"off"`.
+
+### 4. Restart the gateway
+
+```bash
+openclaw gateway restart
+```
+
+## Authorization
+
+On first use, ask the agent to call `otto_setup`. It returns an authorization URL. Visit the URL, approve access, and all travel tools become available.
+
+Alternatively, run `openclaw otto auth` from the terminal.
+
+Tokens are stored at `~/.openclaw/.otto-tokens.json` and refresh automatically.
 
 ## Tools
 
-Tools are discovered dynamically from the MCP server. Currently available:
+Tools are discovered dynamically from the MCP server:
 
-- `read_skill` — Read a skill guide (required before using other tools)
 - `search_flights` — Search flights by route and date
 - `query_flights` — Query search results with SQL
 - `book_flight` — Book a flight
@@ -54,13 +68,11 @@ Tools are discovered dynamically from the MCP server. Currently available:
 - `read_preferences` / `write_preference` — Manage travel preferences
 - `read_loyalty_programs` / `write_loyalty_program` — Manage loyalty programs
 
-## Architecture
+## Troubleshooting
 
-```
-OpenClaw Gateway
-  └─ otto-travel plugin (this repo)
-       └─ StreamableHTTP → https://api.ottotheagent.com/mcp
-            with Authorization: Bearer <oauth_token>
-```
-
-No stdio proxy. No API keys. Direct HTTP with OAuth 2.1.
+| Symptom | Fix |
+|---------|-----|
+| Plugin loaded but agent can't see tools | Add plugin to `tools.sandbox.tools.allow` (see step 3) |
+| `otto_setup` missing | Add `"openclaw-otto-travel"` to `plugins.allow` |
+| OAuth flow never completes | Check the agent's response for the auth URL and visit it |
+| Tools gone after restart | Delete `~/.openclaw/.otto-tokens.json` and re-authorize |
