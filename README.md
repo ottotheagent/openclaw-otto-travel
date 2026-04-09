@@ -7,7 +7,7 @@ OpenClaw plugin for Otto Travel — search, compare, and book flights and hotels
 ### 1. Install the plugin
 
 ```bash
-openclaw plugins install ~/.openclaw/workspace/openclaw-otto-travel.zip
+openclaw plugins install ~/.openclaw/workspace/openclaw-otto-travel.tgz
 ```
 
 ### 2. Configure `~/.openclaw/openclaw.json`

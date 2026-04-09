@@ -4,6 +4,12 @@
   "description": "OpenClaw plugin for Otto Travel — search, compare, and book flights and hotels via Otto's MCP endpoint.",
   "type": "module",
   "main": "index.ts",
+  "files": [
+    "index.ts",
+    "src/",
+    "openclaw.plugin.json",
+    "README.md"
+  ],
   "openclaw": {
     "extensions": ["./index.ts"]
   },
