@@ -1,78 +1,61 @@
 # openclaw-otto-travel
 
-OpenClaw plugin for Otto Travel — search, compare, and book flights and hotels via Otto's MCP endpoint.
+OpenClaw plugin for Otto Travel — search, compare, and book flights and hotels in natural language. Global inventory, live prices, loyalty tracking, PNR-backed bookings.
 
 ## Install
 
-### 1. Install the plugin
-
 ```bash
-openclaw plugins install ~/.openclaw/workspace/openclaw-otto-travel.tgz
+openclaw plugins install clawhub:@ottotheagent/openclaw-otto-travel
 ```
 
-### 2. Configure `~/.openclaw/openclaw.json`
-
-Merge these keys into your existing config:
-
-```json
-{
-  "plugins": {
-    "allow": ["openclaw-otto-travel"]
-  }
-}
-```
-
-### 3. Allow plugin tools in sandbox
-
-If sandbox is enabled (`agents.defaults.sandbox.mode` is `"all"` or `"non-main"`), plugin tools are blocked by default. Add this to your config:
+If your gateway has sandbox mode on (`agents.defaults.sandbox.mode` is `"all"` or `"non-main"`), allow-list the plugin's tools:
 
 ```json
 {
   "tools": {
     "sandbox": {
-      "tools": {
-        "allow": ["openclaw-otto-travel"]
-      }
+      "tools": { "allow": ["openclaw-otto-travel"] }
     }
   }
 }
 ```
 
-Skip this step if sandbox mode is `"off"`.
-
-### 4. Restart the gateway
+Restart the gateway if it doesn't pick up the new plugin automatically:
 
 ```bash
 openclaw gateway restart
 ```
 
-## Authorization
+## Authorize
 
-On first use, ask the agent to call `otto_setup`. It returns an authorization URL. Visit the URL, approve access, and all travel tools become available.
+Ask the agent to call `otto_setup`. It returns an authorization URL — visit it, approve access, and all travel tools become available in the same session.
 
-Alternatively, run `openclaw otto auth` from the terminal.
+Terminal equivalent:
+
+```bash
+openclaw otto auth
+```
 
 Tokens are stored at `~/.openclaw/.otto-tokens.json` and refresh automatically.
 
 ## Tools
 
-Tools are discovered dynamically from the MCP server:
-
-- `search_flights` — Search flights by route and date
-- `query_flights` — Query search results with SQL
-- `book_flight` — Book a flight
-- `search_hotels` — Search hotels by location
-- `get_hotel_rooms` — Get room options for a hotel
-- `book_hotel` — Book a hotel room
-- `get_bookings` — View your bookings
-- `read_preferences` / `write_preference` — Manage travel preferences
-- `read_loyalty_programs` / `write_loyalty_program` — Manage loyalty programs
+- `search_flights`, `query_flights`, `book_flight` — flight search and booking
+- `search_hotels`, `get_hotel_rooms`, `book_hotel` — hotel search and booking
+- `get_bookings`, `cancel_booking` — manage existing bookings
+- `read_preferences`, `write_preference` — travel preferences
+- `read_loyalty_programs`, `write_loyalty_program` — frequent flyer & hotel loyalty
+- `task_status` — poll long-running operations
+- `read_skill` — load a usage guide the agent reads before calling other tools
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---------|-----|
-| Plugin loaded but agent can't see tools | Add plugin to `tools.sandbox.tools.allow` (see step 3) |
-| `otto_setup` missing | Add `"openclaw-otto-travel"` to `plugins.allow` |
-| OAuth flow never completes | Check the agent's response for the auth URL and visit it |
-| Tools gone after restart | Delete `~/.openclaw/.otto-tokens.json` and re-authorize |
+| Plugin loaded but agent can't see tools | Allow-list under `tools.sandbox.tools.allow` (see Install) |
+| OAuth flow never completes | Have the agent show the auth URL, or run `openclaw otto auth` |
+| Tools stop working unexpectedly | Delete `~/.openclaw/.otto-tokens.json` and re-authorize |
+
+## License
+
+MIT
