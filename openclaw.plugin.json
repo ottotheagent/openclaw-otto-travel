@@ -1,14 +1,14 @@
 {
   "id": "openclaw-otto-travel",
   "name": "Otto Travel",
-  "description": "Search, compare, and book flights and hotels via Otto's MCP endpoint with OAuth authentication.",
+  "description": "Search, compare, and book flights and hotels through Otto. Plan trips in natural language, see fare and room options side-by-side, and confirm bookings with PNR — all from your OpenClaw session. Includes loyalty program tracking (frequent flyer, hotel chain) and travel preference storage. OAuth device-flow authorization; tokens refresh automatically.",
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
     "properties": {
       "serverUrl": {
         "type": "string",
-        "description": "Otto MCP server URL (e.g. https://api.ottotheagent.com/mcp)"
+        "description": "Otto MCP server URL. Defaults to https://api.ottotheagent.com/mcp."
       }
     }
   }

@@ -1,7 +1,21 @@
 {
   "name": "openclaw-otto-travel",
-  "version": "0.1.0",
-  "description": "OpenClaw plugin for Otto Travel — search, compare, and book flights and hotels via Otto's MCP endpoint.",
+  "version": "0.2.0",
+  "description": "OpenClaw plugin for Otto Travel — search, compare, and book flights and hotels through Otto's agent. Natural-language trip planning with global inventory, live prices, loyalty program tracking, and PNR-backed bookings.",
+  "keywords": [
+    "openclaw",
+    "openclaw-plugin",
+    "clawhub",
+    "mcp",
+    "travel",
+    "flights",
+    "hotels",
+    "booking",
+    "itinerary",
+    "trip-planning",
+    "loyalty",
+    "otto"
+  ],
   "type": "module",
   "main": "index.ts",
   "files": [
@@ -11,7 +25,15 @@
     "README.md"
   ],
   "openclaw": {
-    "extensions": ["./index.ts"]
+    "extensions": ["./index.ts"],
+    "compat": {
+      "pluginApi": ">=2026.3.24-beta.2",
+      "minGatewayVersion": "2026.3.24-beta.2"
+    },
+    "build": {
+      "openclawVersion": "2026.4.15",
+      "pluginSdkVersion": "2026.4.15"
+    }
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.25.0"
@@ -24,6 +46,10 @@
     "node": ">=18.0.0"
   },
   "license": "MIT",
+  "homepage": "https://github.com/ottotheagent/openclaw-otto-travel#readme",
+  "bugs": {
+    "url": "https://github.com/ottotheagent/openclaw-otto-travel/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ottotheagent/openclaw-otto-travel"
