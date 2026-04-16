@@ -33,7 +33,7 @@ Ask the agent to call `otto_setup`. It returns an authorization URL — visit it
 Terminal equivalent:
 
 ```bash
-openclaw otto auth
+openclaw otto-travel auth
 ```
 
 Tokens are stored at `~/.openclaw/.otto-tokens.json` and refresh automatically.
@@ -53,7 +53,7 @@ Tokens are stored at `~/.openclaw/.otto-tokens.json` and refresh automatically.
 | Symptom | Fix |
 |---------|-----|
 | Plugin loaded but agent can't see tools | Allow-list under `tools.sandbox.tools.allow` (see Install) |
-| OAuth flow never completes | Have the agent show the auth URL, or run `openclaw otto auth` |
+| OAuth flow never completes | Have the agent show the auth URL, or run `openclaw otto-travel auth` |
 | Tools stop working unexpectedly | Delete `~/.openclaw/.otto-tokens.json` and re-authorize |
 
 ## License

@@ -219,40 +219,45 @@ export default {
       },
     });
 
-    // --- CLI: openclaw otto auth / status ---
+    // --- CLI: openclaw otto-travel auth / status ---
+    // Command name "otto-travel" chosen over "otto" to avoid namespace collisions.
+    // `commands` metadata is required on 2026.4.x gateways (manifest-declared needs).
     try {
-      api.registerCli?.(({ program }: { program: any }) => {
-        const otto = program.command("otto").description("Otto Travel plugin commands");
+      api.registerCli?.(
+        ({ program }: { program: any }) => {
+          const otto = program.command("otto-travel").description("Otto Travel plugin commands");
 
-        otto
-          .command("auth")
-          .description("Authorize Otto Travel (interactive device flow)")
-          .action(async () => {
-            console.log("[otto] Starting device authorization...\n");
-            const info = await auth.initiateDeviceAuth();
-            console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-            console.log("  Otto Travel — Device Authorization\n");
-            console.log(`  Visit: ${info.verification_uri_complete}\n`);
-            console.log(`  Or go to: ${info.verification_uri}`);
-            console.log(`  Enter code: ${info.user_code}`);
-            console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-            console.log("Waiting for approval...");
-            await auth.pollForApproval(info);
-            console.log("\n✓ Authorization complete. Tokens saved.");
-            console.log("  Restart the gateway to activate Otto tools.");
-          });
+          otto
+            .command("auth")
+            .description("Authorize Otto Travel (interactive device flow)")
+            .action(async () => {
+              console.log("[otto] Starting device authorization...\n");
+              const info = await auth.initiateDeviceAuth();
+              console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+              console.log("  Otto Travel — Device Authorization\n");
+              console.log(`  Visit: ${info.verification_uri_complete}\n`);
+              console.log(`  Or go to: ${info.verification_uri}`);
+              console.log(`  Enter code: ${info.user_code}`);
+              console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+              console.log("Waiting for approval...");
+              await auth.pollForApproval(info);
+              console.log("\n✓ Authorization complete. Tokens saved.");
+              console.log("  Restart the gateway to activate Otto tools.");
+            });
 
-        otto
-          .command("status")
-          .description("Check Otto Travel authorization status")
-          .action(async () => {
-            if (await auth.hasTokens()) {
-              console.log("✓ Otto Travel is authorized. Tokens found.");
-            } else {
-              console.log("✗ Not authorized. Run: openclaw otto auth");
-            }
-          });
-      });
+          otto
+            .command("status")
+            .description("Check Otto Travel authorization status")
+            .action(async () => {
+              if (await auth.hasTokens()) {
+                console.log("✓ Otto Travel is authorized. Tokens found.");
+              } else {
+                console.log("✗ Not authorized. Run: openclaw otto-travel auth");
+              }
+            });
+        },
+        { commands: ["otto-travel"] },
+      );
     } catch {
       // registerCli not available in all OpenClaw versions
     }
