@@ -22,7 +22,9 @@
     "index.ts",
     "src/",
     "openclaw.plugin.json",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "NOTICE"
   ],
   "openclaw": {
     "extensions": ["./index.ts"],
