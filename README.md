@@ -58,4 +58,4 @@ Tokens are stored at `~/.openclaw/.otto-tokens.json` and refresh automatically.
 
 ## License
 
-MIT
+[Apache-2.0](./LICENSE). "Otto" and the Otto Travel name are trademarks of Otto The Agent; this license grants rights to the code only.
