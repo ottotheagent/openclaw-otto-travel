@@ -1,6 +1,6 @@
 {
   "name": "openclaw-otto-travel",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "OpenClaw plugin for Otto Travel — search, compare, and book flights and hotels through Otto's agent. Natural-language trip planning with global inventory, live prices, loyalty program tracking, and PNR-backed bookings.",
   "keywords": [
     "openclaw",
@@ -48,7 +48,7 @@
     "node": ">=18.0.0"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/ottotheagent/openclaw-otto-travel#readme",
+  "homepage": "https://www.ottotheagent.com",
   "bugs": {
     "url": "https://github.com/ottotheagent/openclaw-otto-travel/issues"
   },
