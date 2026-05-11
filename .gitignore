@@ -5,3 +5,6 @@ dist/
 *.js.map
 !jest.config.js
 *.tgz
+
+# Local superpowers spec/plan working docs — not for the remote branch
+docs/superpowers/
