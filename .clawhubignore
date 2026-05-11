@@ -1,0 +1,21 @@
+# Files to exclude from `clawhub package publish`.
+# clawhub uses gitignore syntax but does NOT read .gitignore — keep this list explicit.
+
+# Local working docs (specs/plans) — not for the published package.
+/docs/
+
+# Test/throwaway tarballs.
+*.tgz
+
+# Build-only and repo-only metadata not needed at runtime.
+/tsconfig.json
+/.gitignore
+/.clawhubignore
+
+# Source — published package ships compiled dist/ instead.
+# Leading slash anchors to repo root so dist/src/ is NOT excluded.
+/index.ts
+/src/
+
+# npm lockfile — consumed by `npm install` only, not by the gateway runtime.
+/package-lock.json
