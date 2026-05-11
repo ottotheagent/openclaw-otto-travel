@@ -2,6 +2,28 @@
   "id": "openclaw-otto-travel",
   "name": "Otto Travel",
   "description": "Search, compare, and book flights and hotels through Otto. Plan trips in natural language, see fare and room options side-by-side, and confirm bookings with PNR — all from your OpenClaw session. Includes loyalty program tracking (frequent flyer, hotel chain) and travel preference storage. OAuth device-flow authorization; tokens refresh automatically.",
+  "activation": {
+    "onStartup": true
+  },
+  "contracts": {
+    "tools": [
+      "read_skill",
+      "search_flights",
+      "query_flights",
+      "book_flight",
+      "search_hotels",
+      "get_hotel_rooms",
+      "book_hotel",
+      "get_bookings",
+      "cancel_booking",
+      "task_status",
+      "read_preferences",
+      "write_preference",
+      "read_loyalty_programs",
+      "write_loyalty_program",
+      "otto_setup"
+    ]
+  },
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
