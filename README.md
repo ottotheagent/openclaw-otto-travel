@@ -5,7 +5,7 @@ OpenClaw plugin for Otto Travel — search, compare, and book flights and hotels
 ## Install
 
 ```bash
-openclaw plugins install clawhub:@ottotheagent/openclaw-otto-travel
+openclaw plugins install clawhub:openclaw-otto-travel
 ```
 
 If your gateway has sandbox mode on (`agents.defaults.sandbox.mode` is `"all"` or `"non-main"`), allow-list the plugin's tools:
